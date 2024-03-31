@@ -1,5 +1,9 @@
-import threading
-from typing import List
+"""
+A class representing a collection of Dial objects, each managing
+a specific category of apps and their volume/mute settings.
+"""
+from contextlib import suppress
+import pulsectl_asyncio
 import pulsectl
 
 from dial import Dial
@@ -7,11 +11,15 @@ from dial import Dial
 PULSE = pulsectl.Pulse('streamdeck_control')
 
 class DialSet:
+    """
+    A class representing a collection of Dial objects, each managing
+    a specific category of apps and their volume/mute settings.
+    """
     def __init__(self):
         """
-        Initializes the class with a list of dials. Sets the dials attribute with the provided list. 
-        Sets the PULSE event mask to "sink_input" and sets the event callback to self.monitor. 
-        Starts listening for PULSE events.
+        Initializes the DialSet class.
+
+        :return: None
         """
         apps = PULSE.sink_input_list()
 
@@ -22,61 +30,38 @@ class DialSet:
         dials = [browserApps, musicApps, gamesApps, chatApps]
 
         self.dials = dials
-        self.callback = None
-        self.stopped = False
-        self.monitor_thread = threading.Thread(target=self.monitor)
-        self.monitor_thread.start()
 
-    def __del__(self):
+    async def monitor(self):
         """
-        Destructor method for the class. Stops event listening.
+        Asynchronously monitors for events related to sink input devices
+        (e.g. new apps added, removed). When an event is detected, adds or
+        removes apps from each Dial object in the DialSet accordingly.
+
+        :return: None
         """
-        PULSE.event_listen_stop()
-    
-    def monitor(self):
-        while True:
-            self.stopped = False
-            PULSE.event_mask_set("all")
-            PULSE.event_callback_set(self.check_event)
-            PULSE.event_listen()
-            self.callback()         
+        async with pulsectl_asyncio.PulseAsync('event-printer') as pulse:
+            async for event in pulse.subscribe_events('sink_input'):
+               print(event)
+               if event.facility == 'sink_input' and event.t == 'new':
+                   self.add_apps()
+               elif event.facility == 'sink_input' and event.t == 'remove':
+                   self.remove_apps()
 
     def add_apps(self):
+        """
+        Adds apps to each Dial object in the DialSet.
+
+        :return: None
+        """
         for dial in self.dials:
             dial.add_apps(PULSE.sink_input_list())
 
     def remove_apps(self):
+        """
+        Removes apps from each Dial object in the DialSet.
+
+        :return: None
+        """
         for dial in self.dials:
             dial.remove_apps(PULSE.sink_input_list())
 
-    def step(self, steps: int, dial: int):
-        self.callback = lambda: self.dials[dial].step(steps)
-        self.stopped = True
-    
-    def mute(self, dial: int):
-        self.callback = lambda: self.dials[dial].mute()
-        self.stopped = True
-
-    def check_event(self, e: pulsectl.PulseEventInfo): 
-        """
-        Monitors the given PulseEventInfo object and performs actions based on the event type.
-        
-        Args:
-            e (pulsectl.PulseEventInfo): The PulseEventInfo object to monitor.
-        
-        Returns:
-            None
-        
-        If the event type is "new, it tells all dials to check for new apps.
-        If the event type is "remove, it tells all dials to check for removed apps.
-        """
-        if self.stopped:
-            raise pulsectl.PulseLoopStop
-        
-        if e.t == 'new':
-            self.callback = self.add_apps
-            raise pulsectl.PulseLoopStop
-
-        if e.t == 'remove':
-            self.callback = self.remove_apps
-            raise pulsectl.PulseLoopStop

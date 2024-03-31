@@ -7,7 +7,11 @@
 
 # Example script showing some Stream Deck + specific functions
 
+import asyncio
+from contextlib import suppress
 import os
+import random
+import signal
 import threading
 import io
 
@@ -39,8 +43,7 @@ img_byte_arr = io.BytesIO()
 img.save(img_byte_arr, format='JPEG')
 img_pressed_bytes = img_byte_arr.getvalue()
 
-dials = DialSet()
-
+dialset = DialSet()
 
 # callback when buttons are pressed or released
 def key_change_callback(deck, key, key_state):
@@ -52,11 +55,9 @@ def key_change_callback(deck, key, key_state):
 # callback when dials are pressed or released
 def dial_change_callback(deck, dial, event, value):
     if event == DialEventType.PUSH:
-        dials.dials[dial].mute();
+        dialset.dials[dial].mute();
     elif event == DialEventType.TURN:
-        print(dials.dials[dial].name)
-        print(f"dial {dial} turned: {value}")
-        dials.step(value, dial)
+        dialset.dials[dial].step(value)
 
 
 # callback when lcd is touched
@@ -73,7 +74,7 @@ def touchscreen_event_callback(deck, evt_type, value):
         print("Drag started @ " + str(value['x']) + "," + str(value['y']) + " ended @ " + str(value['x_out']) + "," + str(value['y_out']))
 
 
-if __name__ == "__main__":
+async def init():
     streamdecks = DeviceManager().enumerate()
 
     print("Found {} Stream Deck(s).\n".format(len(streamdecks)))
@@ -115,10 +116,25 @@ if __name__ == "__main__":
 
         deck.set_touchscreen_image(touchscreen_image_bytes, 0, 0, 800, 100)
 
-        # Wait until all application threads have terminated (for this example,
-        # this is when all deck handles are closed).
-        for t in threading.enumerate():
-            try:
-                t.join()
-            except RuntimeError:
-                pass
+
+
+async def random_task():
+    #sleep for 5 seconds and then print a random number
+    while True:
+        await asyncio.sleep(1)
+        print(random.randint(0, 100))
+
+async def main():
+    init_task = asyncio.create_task(init())
+    monitor_task = asyncio.create_task(dialset.monitor())    
+
+    main_loop = asyncio.gather(init_task, monitor_task)
+
+    for sig in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT):
+        loop.add_signal_handler(sig, main_loop.cancel)
+
+    with suppress(asyncio.CancelledError):
+        await main_loop
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(main())

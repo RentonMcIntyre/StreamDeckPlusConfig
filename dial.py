@@ -1,3 +1,4 @@
+import asyncio
 import json
 
 
@@ -70,10 +71,10 @@ class Dial:
             - Updates the volume level in the JSON file associated with the audio player.
 
         """
-        self.volume = new_volume
-        set_volume = max(0.0, min(1.5, new_volume / 100.0))
+        clamped_value = max(0, min(150, new_volume))
+        self.volume = clamped_value
         for app in self.apps:
-            self.pulse_client.volume_set_all_chans(app, set_volume)
+            self.pulse_client.volume_set_all_chans(app, clamped_value / 100.0) 
         self.update_volume_in_json()
 
         if not is_silent:
@@ -113,6 +114,17 @@ class Dial:
         self.print_status()
     
     def print_status(self):
+        """
+        Print the status of the Dial object.
+
+        This function prints the name, volume, and muted status of the Dial object. It also prints a list of application names associated with the Dial object.
+
+        Parameters:
+            self (Dial): The Dial object.
+
+        Returns:
+            None
+        """
         print("Dial: " + self.name + " volume: " + str(self.volume) + " muted: " + str(self.muted))
         print("\tApps: " + str([app.proplist['application.name'] for app in self.apps]))
 
@@ -137,6 +149,10 @@ class Dial:
 
         if len(to_add) > 0:
             self.apps.extend(to_add)   
+            # Volume set doesn't play nice if it occurs immediately
+            asyncio.sleep(1)
+            self.volume_set(self.volume, True)
+            self.set_muted(self.muted, True)
             self.print_status()
     
     def remove_apps(self, running_apps):
