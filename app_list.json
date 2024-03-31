@@ -1,0 +1,28 @@
+{
+    "Games": {
+        "Apps": [
+            "Apex Legends",
+            "Palworld"
+        ],
+        "Volume": 50
+    },
+    "Music": {
+        "Apps": [
+            "spotify"
+        ],
+        "Volume": 75
+    },
+    "Chat": {
+        "Apps": [
+            "Discord"
+        ],
+        "Volume": 50
+    },
+    "Browser": {
+        "Apps": [
+            "Floorp",
+            "Firefox"
+        ],
+        "Volume": 61
+    }
+}
