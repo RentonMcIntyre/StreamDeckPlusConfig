@@ -15,7 +15,8 @@ from PIL import Image
 from StreamDeck.DeviceManager import DeviceManager
 from StreamDeck.Devices.StreamDeck import DialEventType, TouchscreenEventType
 
-from pulse import get_dials
+from dial_set import DialSet
+
 
 # Folder location of image assets used by this example.
 ASSETS_PATH = os.path.join(os.path.dirname(__file__), "Assets")
@@ -38,7 +39,7 @@ img_byte_arr = io.BytesIO()
 img.save(img_byte_arr, format='JPEG')
 img_pressed_bytes = img_byte_arr.getvalue()
 
-dials = get_dials()
+dials = DialSet()
 
 
 # callback when buttons are pressed or released
