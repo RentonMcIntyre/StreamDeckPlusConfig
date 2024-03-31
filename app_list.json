@@ -4,25 +4,30 @@
             "Apex Legends",
             "Palworld"
         ],
-        "Volume": 50
+        "Volume": 75,
+        "Muted": false
     },
     "Music": {
         "Apps": [
             "spotify"
         ],
-        "Volume": 75
+        "Volume": 27,
+        "Muted": false
     },
     "Chat": {
         "Apps": [
-            "Discord"
+            "Discord",
+            "WEBRTC VoiceEngine"
         ],
-        "Volume": 50
+        "Volume": 105,
+        "Muted": false
     },
     "Browser": {
         "Apps": [
             "Floorp",
             "Firefox"
         ],
-        "Volume": 61
+        "Volume": 67,
+        "Muted": false
     }
 }

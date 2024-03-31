@@ -15,7 +15,7 @@ from PIL import Image
 from StreamDeck.DeviceManager import DeviceManager
 from StreamDeck.Devices.StreamDeck import DialEventType, TouchscreenEventType
 
-from pulse import get_dial, get_dials
+from pulse import get_dials
 
 # Folder location of image assets used by this example.
 ASSETS_PATH = os.path.join(os.path.dirname(__file__), "Assets")
@@ -51,29 +51,11 @@ def key_change_callback(deck, key, key_state):
 # callback when dials are pressed or released
 def dial_change_callback(deck, dial, event, value):
     if event == DialEventType.PUSH:
-        print(f"dial pushed: {dial} state: {value}")
-        if dial == 3 and value:
-            deck.reset()
-            deck.close()
-        else:
-            # build an image for the touch lcd
-            img = Image.new('RGB', (800, 100), 'black')
-            icon = Image.open(os.path.join(ASSETS_PATH, 'Exit.png')).resize((80, 80))
-            img.paste(icon, (690, 10), icon)
-
-            for k in range(0, deck.DIAL_COUNT - 1):
-                img.paste(pressed_icon if (dial == k and value) else released_icon, (30 + (k * 220), 10),
-                          pressed_icon if (dial == k and value) else released_icon)
-
-            img_byte_arr = io.BytesIO()
-            img.save(img_byte_arr, format='JPEG')
-            img_byte_arr = img_byte_arr.getvalue()
-
-            deck.set_touchscreen_image(img_byte_arr, 0, 0, 800, 100)
+        dials.dials[dial].mute();
     elif event == DialEventType.TURN:
-        print(dials[dial].name)
+        print(dials.dials[dial].name)
         print(f"dial {dial} turned: {value}")
-        dials[dial].step(value)
+        dials.step(value, dial)
 
 
 # callback when lcd is touched
