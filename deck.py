@@ -209,7 +209,6 @@ async def main():
     monitor_task = asyncio.create_task(dialset.monitor())    
 
     main_loop = asyncio.gather(init_task, monitor_task)
-    # main_loop = asyncio.gather(init_task)
 
     for sig in (signal.SIGTERM, signal.SIGHUP, signal.SIGINT):
         loop.add_signal_handler(sig, main_loop.cancel)
