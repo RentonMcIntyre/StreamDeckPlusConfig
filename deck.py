@@ -20,6 +20,7 @@ from StreamDeck.ImageHelpers import PILHelper
 from StreamDeck.DeviceManager import DeviceManager
 from StreamDeck.Devices.StreamDeck import DialEventType, TouchscreenEventType
 
+from audio_playback import init_play, mic_mute_toggle, stop_continuous_sample
 from dial_set import DialSet
 
 
@@ -97,6 +98,13 @@ def render_touch_image(deck, icon_filename, font_filename, label_text):
 def key_change_callback(deck, key, key_state):
     print("Key: " + str(key) + " state: " + str(key_state))
 
+    if key == 0 and key_state == True:
+        init_play('bleep500', 30, True)
+    if key == 0 and key_state == False:
+        stop_continuous_sample()
+    if key == 4 and key_state == True:
+        mic_mute_toggle()
+    
     style = get_key_style(deck, key, key_state)
     image = render_key_image(deck, style["icon"], style["font"], style["label"])
     deck.set_key_image(key, image)

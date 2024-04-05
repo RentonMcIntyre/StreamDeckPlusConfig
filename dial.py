@@ -22,7 +22,7 @@ class Dial:
         """
         self.pulse_client = pulse_client
         self.name = name
-        self.apps = [sink_input for app_name in data[self.name]['Apps'] for sink_input in running_apps if app_name == sink_input.proplist['application.name']]
+        self.apps = [sink_input for app_name in data[self.name]['Apps'] for sink_input in running_apps if 'application.name' in sink_input.proplist.keys() and app_name == sink_input.proplist['application.name']]
         self.all_app_names = data[self.name]['Apps']
         self.volume = data[self.name]['Volume']
         self.muted = data[self.name]['Muted']
@@ -141,11 +141,11 @@ class Dial:
         if len(self.apps) == len(self.all_app_names):
             return
 
-        matching_apps = [sink_input for app_name in self.all_app_names for sink_input in running_apps if app_name == sink_input.proplist['application.name']]
+        # matching_apps = [sink_input for app_name in self.all_app_names for sink_input in running_apps if 'application.name' in sink_input.proplist.keys() and  app_name == sink_input.proplist['application.name']]
         loaded_apps = [sink_input.proplist['application.name'] for sink_input in self.apps]
 
         not_loaded_apps = [app_name for app_name in self.all_app_names if app_name not in loaded_apps]
-        to_add = [sink_input for app_name in not_loaded_apps for sink_input in running_apps if app_name == sink_input.proplist['application.name']]
+        to_add = [sink_input for app_name in not_loaded_apps for sink_input in running_apps if 'application.name' in sink_input.proplist.keys() and  app_name == sink_input.proplist['application.name']]
 
         if len(to_add) > 0:
             self.apps.extend(to_add)   
@@ -168,7 +168,7 @@ class Dial:
         if len(self.apps) == 0:
             return
 
-        running_app_names = [sink_input.proplist['application.name'] for app_name in self.all_app_names for sink_input in running_apps if app_name == sink_input.proplist['application.name']]
+        running_app_names = [sink_input.proplist['application.name'] for app_name in self.all_app_names for sink_input in running_apps if 'application.name' in sink_input.proplist.keys() and  app_name == sink_input.proplist['application.name']]
         loaded_apps = [sink_input.proplist['application.name'] for sink_input in self.apps]
 
         to_remove = [app_name for app_name in loaded_apps if app_name not in running_app_names]
