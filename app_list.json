@@ -1,0 +1,35 @@
+{
+    "Games": {
+        "Apps": [
+            "Apex Legends",
+            "Pal",
+            "Hades II"
+        ],
+        "Volume": 45,
+        "Muted": false
+    },
+    "Music": {
+        "Apps": [
+            "spotify",
+            "spotify-player"
+        ],
+        "Volume": 34,
+        "Muted": false
+    },
+    "Chat": {
+        "Apps": [
+            "Discord",
+            "WEBRTC VoiceEngine"
+        ],
+        "Volume": 76,
+        "Muted": false
+    },
+    "Browser": {
+        "Apps": [
+            "Floorp",
+            "Firefox"
+        ],
+        "Volume": 46,
+        "Muted": false
+    }
+}
