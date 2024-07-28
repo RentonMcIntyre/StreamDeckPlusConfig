@@ -1,0 +1,4 @@
+Pillow>=10.4.0
+pulsectl_asyncio>=1.2.0
+pulsectl>=24.4.0
+pygame>=2.6.0

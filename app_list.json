@@ -5,7 +5,7 @@
             "Pal",
             "Hades II"
         ],
-        "Volume": 45,
+        "Volume": 46,
         "Muted": false
     },
     "Music": {
@@ -13,7 +13,7 @@
             "spotify",
             "spotify-player"
         ],
-        "Volume": 34,
+        "Volume": 37,
         "Muted": false
     },
     "Chat": {
@@ -21,15 +21,16 @@
             "Discord",
             "WEBRTC VoiceEngine"
         ],
-        "Volume": 76,
+        "Volume": 77,
         "Muted": false
     },
     "Browser": {
         "Apps": [
             "Floorp",
+            "Zen Browser",
             "Firefox"
         ],
-        "Volume": 46,
+        "Volume": 58,
         "Muted": false
     }
 }
